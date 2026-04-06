@@ -1,0 +1,55 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: elastic-init-job
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "4"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  backoffLimit : 0
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: elastic-init
+          image: python:3.11-slim
+          env:
+            - name: ES_HOST
+              value: "ic4302-es-http"
+            - name: ES_PORT
+              value: "9200"
+            - name: ES_USER
+              value: "elastic"
+            - name: ES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ic4302-es-elastic-user
+                  key: elastic
+          command: ["sh", "-c"]
+          args:
+            - |
+              pip install "elasticsearch==8.17.0" faker --quiet &&
+              python3 - <<'EOF'
+              import os
+              from elasticsearch import Elasticsearch
+              from faker import Faker
+
+              fake = Faker()
+
+              es = Elasticsearch(
+                  f"http://{os.environ['ES_HOST']}:{os.environ['ES_PORT']}",
+                  basic_auth=(os.environ['ES_USER'], os.environ['ES_PASSWORD'])
+              )
+
+              for i in range(600):
+                  es.index(index="users", document={
+                      "name": fake.name(),
+                      "email": fake.email(),
+                      "age": fake.random_int(min=18, max=80),
+                      "city": fake.city(),
+                      "created_at": fake.date_time_this_year().isoformat()
+                  })
+
+              
+              EOF

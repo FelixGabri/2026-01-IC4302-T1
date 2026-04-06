@@ -1,0 +1,53 @@
+Para meter Elastic Search
+
+Chart databases: Chart.yaml  cambiar de postgres.enables a  elastic.enabled
+
+
+
+
+Ver contraseña : kubectl get secret ic4302-es-elastic-user -o jsonpath="{.data.elastic}" | base64 --decode
+
+
+kubectl exec -it ic4302-es-default-0 -- curl -s -u elastic:<password> http://localhost:9200
+
+
+Meter el elastic job yaml: elastic-init-job.yaml  en templates
+
+
+PS C:\Users\oscar\Documents\CINCO\BD2\TareasCortas\Tarea1\TC1Inicial\TC1\charts\databases\templates> kubectl apply -f elastic-init-job.yaml
+job.batch/elastic-init-job created
+
+En chart.yaml ahi mismo, cambiar esta linea: 
+
+  - name: prometheus-elasticsearch-exporter
+    version: "7.2.1"
+    repository: https://prometheus-community.github.io/helm-charts
+    condition: postgresql.enabled
+
+Por esto:
+
+ - name: prometheus-elasticsearch-exporter
+    version: "7.2.1"
+    repository: https://prometheus-community.github.io/helm-charts
+    condition: elasticsearch.enabled
+
+
+
+kubectl delete job elastic-init-job
+kubectl apply -f elastic-init-job.yaml
+kubectl get pods | findstr elastic-init
+
+
+Ahora, como hacer un lo de grafana.
+
+1.REvisar json
+
+correr un comnando equivalente, o cambiarlo a mano  para el mismo .json:
+
+(Get-Content elasticsearch.json) -replace '\$\{DS_PROMETHEUS\}', 'Prometheus' | Set-Content elasticsearch.json
+
+
+Crear archivo example: ElasticSimulation.java junto al resto.  En la carpeta gatling, src, example.
+
+Agregar esto:
+Docker -> FlaskApp -> APP  -> requierements.txt  : elasticsearch ==8.17.0

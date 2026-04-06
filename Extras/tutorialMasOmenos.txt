@@ -1,0 +1,26 @@
+
+Paso 0: 
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add couchdb https://apache.github.io/couchdb-helm
+helm repo update
+
+
+1. En Git Bash:
+
+Poner direcion propia de charts en gitbash: cd C:\Users\oscar\Documents\CINCO\BD2\TareasCortas\Tarea1\TC1\charts
+bash install.sh
+
+1.1: Si grafana falla: helm install grafana-config grafana-config
+
+2. Poner direcion propia de docker, gitbash tambien:    cd  C:\Users\oscar\Documents\CINCO\BD2\TareasCortas\Tarea1\TC1\docker> 
+
+bash build.sh su-usuario-dockerhub
+
+3. Actualizar el values.yaml del app chart con usuario
+
+
+image: su-usuario/flask-example:latest
+
+4.cd TC1/charts
+helm upgrade --install app app

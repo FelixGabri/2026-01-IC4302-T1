@@ -1,0 +1,7 @@
+Flask es un framework web de Python.
+
+
+Flask funciona de traductor entre Gatling y las bases de datos.
+Gatling solo habla en HTTPS, mientras que cada base tiene su propio sistema de instrucciones.
+
+Gatling -> HTTP -> Flask -> instrucciones de cada BD -> Base de datos

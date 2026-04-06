@@ -1,0 +1,49 @@
+grafana:
+  namespaceOverride: monitoring
+  operator:
+    image:
+      repository: bitnamilegacy/grafana-operator
+    enabled: true
+    scanAllNamespaces: true
+    prometheus:
+      serviceMonitor:
+        enabled: false
+  grafana:
+    enabled: true
+    image:
+      repository: bitnamilegacy/grafana
+    dashboardLabelSelectors:
+      - matchLabels:
+          app: grafana
+    persistence:
+      enabled: true
+      size: 5Gi
+prometheus:
+  namespaceOverride: monitoring
+  prometheus:
+    image:
+      repository: bitnamilegacy/prometheus
+    retention: 2d
+    persistence:
+      enabled: true
+      size: 5Gi
+  alertmanager:
+    image:
+      repository: bitnamilegacy/alertmanager
+    persistence:
+      enabled: false
+      size: 5Gi
+      annotations: {}   # es el campo persistence del alertmanager que genera un annotations: null
+  operator:
+    image:
+      repository: bitnamilegacy/prometheus-operator
+  blackboxExporter: 
+    image:
+      repository: bitnamilegacy/blackbox-exporter 
+  node-exporter: 
+    image:
+      repository: bitnamilegacy/node-exporter
+  kube-state-metrics: 
+    image:
+      repository: bitnamilegacy/kube-state-metrics
+

@@ -1,0 +1,43 @@
+Instalar app y grafana-config:
+
+Instalar grafana-config:
+
+
+
+Pagina principal de grafana-config: https://github.com/grafana/grafana-operator?tab=readme-ov-file#installation
+
+En la parte de Releases, despues assets de descargo el archivo crds.yaml
+Archivo crds.yaml:  
+crds: Le enseñan  al cluster tres nuevos tipos de objetos : Grafana, GrafanaDashboard y GrafanaDataSource
+
+
+Correr este comando para usar los crds: kubectl apply -f C:\Users\oscar\Documents\CINCO\BD2\TareasCortas\Tarea1\TC1\grafana\crds.yaml
+
+cd charts
+
+
+Revisar que esten bien instalados los crds: kubectl get crd | findstr grafana
+
+Esperar un momento mientras se registran
+
+Regisrar grafana-config: 
+
+Correr: helm upgrade --install grafana-config grafana-config
+
+
+
+
+
+
+Endgame:
+
+
+
+Paso 1 — Node Exporter: Una sola vez para todo. Es un dashboard del servidor, no de la base de datos. Muestra CPU, disco, memoria, red del nodo donde corren todos los pods.
+
+https://grafana.com/grafana/dashboards/1860-node-exporter-full/
+
+
+Paso 2 — Flask ServiceMonitor: Una sola vez también. Flask es una sola app que se conecta a todas las bases de datos, entonces un solo dashboard de Flask muestra las peticiones HTTP hacia todas las BDs.
+
+gatling-maven-plugin-demo-java-main

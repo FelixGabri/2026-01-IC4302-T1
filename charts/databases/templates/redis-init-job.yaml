@@ -1,0 +1,56 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: redis-init-job
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "3"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: redis-init
+          image: python:3.11-slim
+          env:
+            - name: REDIS_HOST
+              value: "databases-redis-master"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: databases-redis
+                  key: redis-password
+          command: ["sh", "-c"]
+          args:
+            - |
+              pip install redis faker --quiet &&
+              python3 - <<'EOF'
+              import os
+              import json
+              import redis
+              from faker import Faker
+
+              fake = Faker()
+
+              r = redis.Redis(
+                  host=os.environ["REDIS_HOST"],
+                  port=int(os.environ["REDIS_PORT"]),
+                  password=os.environ["REDIS_PASSWORD"],
+                  decode_responses=True
+              )
+
+              for i in range(600):
+                  user = {
+                      "name": fake.name(),
+                      "email": fake.email(),
+                      "age": fake.random_int(min=18, max=80),
+                      "city": fake.city(),
+                      "created_at": fake.date_time_this_year().isoformat()
+                  }
+                  r.hset(f"user:{i}", mapping=user)
+
+              print(f"Insertados 600 usuarios en Redis")
+              EOF

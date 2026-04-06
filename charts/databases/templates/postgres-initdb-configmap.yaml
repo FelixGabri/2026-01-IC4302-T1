@@ -1,0 +1,13 @@
+# Este archivo permite referenciar al contenido del sql para crear las tablas y datos INICIALES de prueba
+{{- if .Values.postgresql.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-initdb-scripts
+data:
+  init.sh: |
+    #!/bin/bash
+    sed 's/\r//' /docker-entrypoint-initdb.d/init.sql | PGPASSWORD=$POSTGRES_PASSWORD psql -U postgres -d postgres
+  init.sql: |
+{{ .Files.Get "scripts/postgres_init.sql" | indent 4 }}
+{{- end }}

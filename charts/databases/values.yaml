@@ -1,0 +1,127 @@
+elasticsearch:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: "monitoring"
+elastic:
+  enabled: true
+  version: 8.6.1
+  replicas: 1
+  name: ic4302
+kibana:
+  version: 8.6.1
+  replicas: 1
+  name: ic4302
+prometheus-elasticsearch-exporter:
+  env:
+    ES_USERNAME: elastic
+  extraEnvSecrets:
+    ES_PASSWORD:
+      secret: ic4302-es-elastic-user
+      key: elastic
+  es:
+    uri: http://ic4302-es-http:9200
+    cluster_settings: true
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring
+
+redis:
+  enabled: true
+  image:
+    repository: bitnamilegacy/redis
+  metrics:
+    enabled: true
+    image:
+      repository: bitnamilegacy/redis-exporter
+    serviceMonitor:
+      enabled: true
+      namespace: "monitoring"
+
+memcached:
+  enabled: true
+  image:
+    repository: bitnamilegacy/memcached
+  metrics:
+    enabled: true
+    image:
+      repository: bitnamilegacy/memcached-exporter
+    serviceMonitor:
+      enabled: true
+      namespace: "monitoring"
+
+postgresql:
+  primary:
+    initdb:
+      scriptsConfigMap: postgres-initdb-scripts
+  enabled: true
+  image:
+    repository: bitnamilegacy/postgresql
+  metrics:
+    enabled: true
+    image:
+      repository: bitnamilegacy/postgres-exporter
+    serviceMonitor:
+      enabled: true
+      namespace: "monitoring"
+
+
+#---------------------------------------------------------------
+
+
+mongodb:
+  enabled: true
+  image:
+    repository: bitnamilegacy/mongodb   
+  architecture: replicaset
+  replicaCount: 3
+  auth:
+    rootPassword: mongo123
+    username: mongouser
+    password: mongo123
+    database: ic4302
+  metrics:
+    enabled: true
+    image:
+      repository: bitnamilegacy/mongodb-exporter   
+    serviceMonitor:
+      enabled: true
+      namespace: "monitoring"
+
+mariadb:
+  initdbScriptsConfigMap: mariadb-initdb-scripts
+  enabled: true
+  image:
+    repository: bitnamilegacy/mariadb   
+  architecture: replication
+  auth:
+    rootPassword: mariadb123
+    username: mariadbuser
+    password: mariadb123
+    database: ic4302
+  primary:
+    replicaCount: 1
+  secondary:
+    replicaCount: 2
+  metrics:
+    enabled: true
+    image:
+      repository: bitnamilegacy/mysqld-exporter   
+    serviceMonitor:
+      enabled: true
+      namespace: "monitoring"
+
+couchdb:
+  enabled: true
+  couchdbConfig:
+    couchdb:
+      uuid: "b3c5d5d5-1234-5678-abcd-ef0123456789"
+  auth:
+    username: couchdbuser
+    password: couchdb123
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: "monitoring"

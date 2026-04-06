@@ -1,0 +1,62 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: couchdb-init-job
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "2"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: couchdb-init
+          image: python:3.11-slim
+          env:
+            - name: COUCH_HOST
+              value: "databases-svc-couchdb"
+            - name: COUCH_PORT
+              value: "5984"
+            - name: COUCH_USER
+              value: "admin"
+            - name: COUCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: databases-couchdb
+                  key: adminPassword
+          command: ["sh", "-c"]
+          args:
+            - |
+              pip install couchdb faker --quiet &&
+              python3 - <<'EOF'
+              import os
+              import couchdb
+              from faker import Faker
+
+              fake = Faker()
+
+              host = os.environ["COUCH_HOST"]
+              port = os.environ["COUCH_PORT"]
+              user = os.environ["COUCH_USER"]
+              password = os.environ["COUCH_PASSWORD"]
+
+              server = couchdb.Server(f"http://{user}:{password}@{host}:{port}/")
+
+              # Crear base de datos si no existe
+              if "ic4302" not in server:
+                  db = server.create("ic4302")
+              else:
+                  db = server["ic4302"]
+
+              for _ in range(600):
+                  db.save({
+                      "name": fake.name(),
+                      "email": fake.email(),
+                      "age": fake.random_int(min=18, max=80),
+                      "city": fake.city(),
+                      "created_at": fake.date_time_this_year().isoformat()
+                  })
+
+              print(f"Insertados 100 usuarios en CouchDB")
+              EOF

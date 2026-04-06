@@ -1,0 +1,9 @@
+dependencies:
+- name: grafana-operator
+  repository: https://charts.bitnami.com/bitnami
+  version: 4.9.37
+- name: kube-prometheus
+  repository: https://charts.bitnami.com/bitnami
+  version: 11.3.10
+digest: sha256:c8d539f50a8f88095b91b322973e22adab99baffc744413b48d9918eb2ae63a6
+generated: "2026-04-04T16:14:08.6673872-06:00"

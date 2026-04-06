@@ -1,0 +1,18 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: prometheus
+  namespace: {{ .Values.prometheus.namespace }}
+spec:
+  instanceSelector:
+    matchLabels:
+       app.kubernetes.io/name: grafana
+  datasource:
+    name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://monitoring-stack-prometheu-prometheus:9090
+    isDefault: true
+    jsonData:
+      tlsSkipVerify: true
+      timeInterval: "5s"

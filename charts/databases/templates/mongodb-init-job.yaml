@@ -1,0 +1,61 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mongodb-init-job
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: mongo-init
+          image: python:3.11-slim
+          env:
+            - name: MONGO_HOST
+              value: "databases-mongodb-headless"
+            - name: MONGO_PORT
+              value: "27017"
+            - name: MONGO_USER
+              value: "root"
+            - name: MONGO_PASSWORD
+              value: "mongo123"
+            - name: MONGO_DB
+              value: "ic4302"
+          command: ["sh", "-c"]
+          args:
+            - |
+              pip install pymongo faker --quiet &&
+              python3 - <<'EOF'
+              import os
+              from pymongo import MongoClient
+              from faker import Faker
+
+              fake = Faker()
+
+              host = os.environ["MONGO_HOST"]
+              port = int(os.environ["MONGO_PORT"])
+              user = os.environ["MONGO_USER"]
+              password = os.environ["MONGO_PASSWORD"]
+              db_name = os.environ["MONGO_DB"]
+
+              uri = f"mongodb://{user}:{password}@{host}:{port}/?replicaSet=rs0&authSource=admin"
+              client = MongoClient(uri)
+              db = client[db_name]
+
+              users = []
+              for _ in range(600):
+                  users.append({
+                      "name": fake.name(),
+                      "email": fake.email(),
+                      "age": fake.random_int(min=18, max=80),
+                      "city": fake.city(),
+                      "created_at": fake.date_time_this_year().isoformat()
+                  })
+
+              db.users.insert_many(users)
+              print(f"Insertados {len(users)} usuarios en MongoDB")
+              client.close()
+              EOF

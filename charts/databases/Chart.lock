@@ -1,0 +1,24 @@
+dependencies:
+- name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 19.6.4
+- name: memcached
+  repository: https://charts.bitnami.com/bitnami
+  version: 7.4.11
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 15.5.21
+- name: prometheus-elasticsearch-exporter
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 7.2.1
+- name: mongodb
+  repository: https://charts.bitnami.com/bitnami
+  version: 16.3.3
+- name: mariadb
+  repository: https://charts.bitnami.com/bitnami
+  version: 19.1.2
+- name: couchdb
+  repository: https://apache.github.io/couchdb-helm
+  version: 4.5.6
+digest: sha256:0d9343b8da0a6721c7da3e05fb45db3ccbac8e55532abdac6a1a3351c46e74c2
+generated: "2026-04-04T16:14:51.5078791-06:00"

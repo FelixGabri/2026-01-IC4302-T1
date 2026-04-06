@@ -1,0 +1,111 @@
+Ya existe:
+
+1. Prometheus + Grafana
+2.Ls configuran de grafana inicial(dashboard, JSONS Mongo, redis elastic)
+3.boostrap (Elasticsearch)
+4.bases de datos: Postgre, Redis Elasticsearch
+
+
+Faltan: Mongo,Maria,Couch
+
+Archivos modificados
+  databases/Chart.yaml con dependcias parecidas a las que ya estan(couch,mongo,maria)
+  
+  databases/values.yaml tambien con lo mismo
+  
+  flash.yaml meter los ports
+  
+  
+Paso 1 correr con git bash :
+
+bash install.sh
+
+
+Todos deberian estar running, posibles errores:
+
+Ya exite una instancia de una base de datos vieja
+
+Para probar:
+
+cd databases
+helm dependency update
+cd ..
+helm upgrade --install databases databases
+
+
+Despues revisar: 
+
+kubectl get pods -A
+
+CONTRUIR LA IMAGEN A DOCKER:
+
+USERNAME: Nombre de usario de Docker
+
+desde cd flaskapp:
+
+docker login
+docker build -t USERNAME/flask-ic4302:latest 
+docker push USERNAME/flask-ic4302:latest
+
+docker build -t oscarbezara/flask-ic4302:latest .
+docker push oscarbezara/flask-ic4302:latest
+
+En values.yaml de app, poner el username tambien
+
+
+Para actualizar app.py:
+cd charts
+helm upgrade --install app app
+
+Tambien en cmd:
+kubectl rollout restart deployment/flasktest -n default
+
+Revisar que flask este corriendo: 
+
+kubectl get pods -n default | findstr flask
+
+REvisar errores especificos si flask crashea:
+*CODIGRO ERROR se encuentra en el comando anterior, por ejemplo: flasktest-5df69894f-l7hn2, entonces el comando seria kubectl logs flasktest-5df69894f-l7hn2 -n default
+
+kubectl logs flasktest-CODIGOERROR -n default
+
+
+Instalar app y grafana-config:
+
+Instalar grafana-config:
+
+
+
+
+
+
+
+
+
+
+
+- `databases/Chart.yaml` : MongoDB, MariaDB y CouchDB
+- `databases/values.yaml` : configuración de MongoDB, MariaDB y CouchDB con `bitnamilegacy`
+- `monitoring-stack/Chart.yaml` : versiones actualizadas a grafana-operator `4.9.37` y kube-prometheus `11.3.10`
+- `monitoring-stack/values.yaml` : persistencia deshabilitada en prometheus y alertmanager
+- `grafana-config/templates/dashboard-loader.yaml` : versión cambiada a `v1beta1`
+- `grafana-config/templates/prometheus-datasource.yaml` : versión cambiada a `v1beta1`
+
+
+
+TODO 
+Lo que queda pendiente
+
+
+monitoring namespace:  Prometheus + Grafana + Alertmanager (x)
+default namespace:     MongoDB, MariaDB, PostgreSQL, Redis, Memcached, CouchDB, Elasticsearch (x)
+Instalar app y grafana-config con Helm         (x)
+Completar la Flask app intermediaria           ()
+Escribir los scripts de Gatling                ()
+Poblar las bases de datos con datos de prueba  ()
+Correr las pruebas de carga de 30 minutos      ()
+
+
+
+
+

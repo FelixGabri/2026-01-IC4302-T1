@@ -1,0 +1,6 @@
+config:
+  flask:
+    enabled: true
+    name: flasktest
+    replicas: 1
+    image: oscarbezara/flask-ic4302:latest
